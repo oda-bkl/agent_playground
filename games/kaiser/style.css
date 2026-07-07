@@ -1,0 +1,242 @@
+/* C64 homage: the classic blue-on-blue with the light-blue border frame,
+   scaled to the full modern viewport. Palette approximates the C64's. */
+
+:root {
+  --blue: #352879;
+  --lblue: #6c5eb5;
+  --white: #ffffff;
+  --red: #9a6759;
+  --green: #9ad284;
+  --yellow: #b8c76f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--lblue);
+}
+
+body {
+  padding: 24px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+}
+
+#app {
+  background: var(--blue);
+  color: var(--lblue);
+  min-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- CRT scanline overlay ---------- */
+
+#crt { display: none; }
+
+body.crt #crt {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+}
+
+/* ---------- chrome ---------- */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  border-bottom: 2px solid var(--lblue);
+}
+
+.brand {
+  color: var(--white);
+  font-size: 24px;
+  letter-spacing: 6px;
+}
+
+.tagline {
+  color: var(--lblue);
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.meta {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.badge {
+  background: var(--lblue);
+  color: var(--blue);
+  padding: 1px 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.badge:hover { background: var(--white); }
+
+main {
+  flex: 1;
+  padding: 30px 24px 24px;
+  overflow: auto;
+}
+
+footer {
+  border-top: 2px solid var(--lblue);
+  padding: 10px 24px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.sub { font-size: 13px; letter-spacing: 1px; margin: 4px 0; }
+.warn { color: var(--red); }
+
+/* ---------- dashboard ---------- */
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 26px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.panel {
+  border: 2px solid var(--lblue);
+  padding: 16px 18px 14px;
+}
+
+.panel h2 {
+  margin: -27px 0 10px -6px;
+  display: inline-block;
+  background: var(--blue);
+  padding: 0 8px;
+  color: var(--yellow);
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+
+.stat {
+  color: var(--white);
+  font-size: 24px;
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+.panel.control.focused { outline: 2px dashed var(--yellow); outline-offset: 5px; }
+
+.selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+.arrow {
+  cursor: pointer;
+  color: var(--white);
+  font-size: 20px;
+  padding: 2px 12px;
+  border: 2px solid var(--lblue);
+  user-select: none;
+}
+
+.arrow:hover { background: var(--lblue); color: var(--blue); }
+
+.sel-name {
+  color: var(--white);
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.endyear {
+  margin: 34px auto 0;
+  display: block;
+  background: var(--lblue);
+  color: var(--blue);
+  border: 0;
+  font: inherit;
+  font-size: 18px;
+  padding: 12px 32px;
+  cursor: pointer;
+  letter-spacing: 3px;
+}
+
+.endyear:hover { background: var(--white); }
+
+/* ---------- chronicle ---------- */
+
+.chronicle {
+  max-width: 760px;
+  margin: 4vh auto;
+  border: 2px solid var(--lblue);
+  padding: 26px 32px 30px;
+}
+
+.chronicle h2 {
+  color: var(--yellow);
+  letter-spacing: 3px;
+  font-size: 16px;
+  margin: 0 0 18px;
+}
+
+.line {
+  color: var(--white);
+  margin: 12px 0;
+  font-size: 17px;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+  animation: appear 0.35s;
+}
+
+.line.grim { color: var(--red); }
+
+@keyframes appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.continue {
+  margin-top: 26px;
+  color: var(--yellow);
+  letter-spacing: 2px;
+  font-size: 13px;
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- end screen ---------- */
+
+.endscreen {
+  max-width: 700px;
+  margin: 10vh auto;
+  text-align: center;
+  border: 2px solid var(--lblue);
+  padding: 40px 36px;
+}
+
+.endscreen h1 {
+  color: var(--white);
+  letter-spacing: 8px;
+  margin: 0 0 20px;
+}
+
+.endscreen p {
+  font-size: 16px;
+  line-height: 1.7;
+}
