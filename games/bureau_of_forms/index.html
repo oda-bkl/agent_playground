@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STEMPEL! — Bureau of Forms</title>
+<style>
+  :root{
+    --desk:#2e3a31;
+    --desk-dark:#242e26;
+    --paper:#efe4c4;
+    --paper-edge:#d9c99a;
+    --ink:#26304a;
+    --ink-faint:#26304a99;
+    --red:#b23a2c;
+    --green:#2f6b3d;
+    --sticky:#f6d95c;
+    --bone:#e8e2cf;
+    --stamp-font:'Haettenschweiler','Arial Narrow Bold',Impact,'Arial Black',sans-serif;
+    --type-font:'Courier New',Courier,monospace;
+    --ui-font:Verdana,Geneva,'DejaVu Sans',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--ui-font);
+    color:var(--bone);
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 0%, #0000 55%, #00000055 100%),
+      repeating-linear-gradient(87deg, #ffffff05 0 2px, #0000 2px 7px),
+      linear-gradient(180deg, #35423a 0%, var(--desk) 40%, var(--desk-dark) 100%);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    overflow-x:hidden;
+  }
+
+  /* ---------- header nameplate ---------- */
+  header{
+    width:min(680px, 94vw);
+    margin-top:18px;
+    display:flex;
+    align-items:stretch;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .nameplate{
+    background:linear-gradient(180deg,#5d4a33,#3f3223);
+    border:2px solid #2a2117;
+    border-radius:4px;
+    padding:8px 14px;
+    box-shadow:0 3px 0 #1c1610, inset 0 1px 0 #ffffff2a;
+    flex:1;
+    min-width:0;
+  }
+  .nameplate h1{
+    margin:0;
+    font-family:var(--stamp-font);
+    font-weight:normal;
+    font-size:clamp(18px,4.5vw,26px);
+    letter-spacing:2px;
+    color:#e9d9a8;
+    text-transform:uppercase;
+    text-shadow:0 1px 0 #000;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .nameplate small{
+    display:block;
+    font-size:10px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:#c8b98d;
+  }
+  .counter{
+    background:linear-gradient(180deg,#5d4a33,#3f3223);
+    border:2px solid #2a2117;
+    border-radius:4px;
+    box-shadow:0 3px 0 #1c1610, inset 0 1px 0 #ffffff2a;
+    padding:6px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    min-width:86px;
+  }
+  .counter .label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#c8b98d}
+  .counter .value{
+    font-family:var(--type-font);
+    font-variant-numeric:tabular-nums;
+    font-weight:bold;
+    font-size:24px;
+    color:#e9d9a8;
+    line-height:1.1;
+  }
+  .strikes{display:flex;gap:5px;margin-top:2px}
+  .strike-slot{
+    width:20px;height:14px;
+    border:1px dashed #c8b98d77;
+    border-radius:2px;
+    font-family:var(--stamp-font);
+    font-size:11px;
+    line-height:13px;
+    text-align:center;
+    color:transparent;
+  }
+  .strike-slot.hit{
+    border:1px solid var(--red);
+    color:#ff6a55;
+    background:#b23a2c33;
+    transform:rotate(-6deg);
+  }
+
+  /* ---------- desk area ---------- */
+  main{
+    width:min(680px,94vw);
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+    padding:14px 0 8px;
+  }
+
+  .patience{
+    width:min(440px,86vw);
+    margin-bottom:12px;
+  }
+  .patience .label{
+    font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+    color:#cfc7ad;opacity:.8;margin-bottom:4px;text-align:center;
+  }
+  .patience .track{
+    height:10px;
+    background:#00000055;
+    border:1px solid #00000088;
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .patience .fill{
+    height:100%;
+    width:100%;
+    background:linear-gradient(90deg,#8db56b,#c9c85a);
+    transition:background .3s;
+  }
+  .patience .fill.angry{background:linear-gradient(90deg,#c96a3a,#b23a2c)}
+
+  /* ---------- sticky note ---------- */
+  .sticky{
+    position:absolute;
+    top:52px;
+    right:calc(50% + 150px);
+    width:172px;
+    background:linear-gradient(180deg,var(--sticky),#e8c94a);
+    color:#4a3d10;
+    padding:12px 12px 14px;
+    transform:rotate(-4deg);
+    box-shadow:3px 5px 8px #00000066;
+    font-family:var(--type-font);
+    font-size:11.5px;
+    line-height:1.5;
+    z-index:2;
+  }
+  .sticky::before{
+    content:"";
+    position:absolute;
+    top:-8px;left:50%;
+    width:70px;height:16px;
+    transform:translateX(-50%) rotate(1deg);
+    background:#ffffff66;
+    border:1px solid #00000012;
+  }
+  .sticky h2{
+    margin:0 0 6px;
+    font-family:var(--stamp-font);
+    font-weight:normal;
+    font-size:14px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+  }
+  .sticky ul{margin:0;padding-left:16px}
+  .sticky li{margin-bottom:3px}
+  .sticky .reg{display:block;font-size:9px;opacity:.7;margin-top:6px;letter-spacing:1px}
+
+  /* ---------- the form ---------- */
+  .paper-zone{
+    position:relative;
+    width:min(340px,88vw);
+    height:340px;
+    perspective:900px;
+  }
+  .paper{
+    position:absolute;
+    inset:0;
+    background:
+      repeating-linear-gradient(180deg,#0000 0 26px,#00000007 26px 27px),
+      linear-gradient(160deg,#f4ecd4 0%,var(--paper) 55%,#e5d6ab 100%);
+    border:1px solid var(--paper-edge);
+    box-shadow:0 8px 18px #00000073, inset 0 0 40px #d9c99a44;
+    padding:16px 18px;
+    font-family:var(--type-font);
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    transform-origin:50% 60%;
+  }
+  .paper.slide-in{animation:slideIn .32s ease-out}
+  .paper.fly-off{animation:flyOff .45s ease-in forwards}
+  .paper.rejected-shake{animation:shake .4s ease-in-out}
+  @keyframes slideIn{
+    from{transform:translateY(120%) rotate(6deg);opacity:0}
+    to{transform:translateY(0) rotate(0);opacity:1}
+  }
+  @keyframes flyOff{
+    to{transform:translate(130%,-40%) rotate(24deg);opacity:0}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-9px) rotate(-1deg)}
+    45%{transform:translateX(8px) rotate(1deg)}
+    70%{transform:translateX(-5px)}
+  }
+
+  .form-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:6px;
+    margin-bottom:10px;
+  }
+  .form-code{
+    font-family:var(--stamp-font);
+    font-size:30px;
+    letter-spacing:1px;
+    line-height:1;
+  }
+  .form-head .dept{
+    font-size:9px;
+    letter-spacing:1px;
+    text-align:right;
+    line-height:1.5;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .barcode{
+    margin-top:3px;
+    height:14px;
+    width:74px;
+    margin-left:auto;
+    background:repeating-linear-gradient(90deg,var(--ink) 0 2px,#0000 2px 4px,var(--ink) 4px 5px,#0000 5px 8px);
+  }
+  .form-label{
+    font-size:9px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:2px;
+  }
+  .request-text{
+    font-size:14.5px;
+    font-weight:bold;
+    line-height:1.45;
+    min-height:84px;
+    margin-bottom:auto;
+    text-wrap:balance;
+  }
+  .form-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:8px;
+    font-size:11px;
+    border-top:1px dashed var(--ink-faint);
+    padding-top:8px;
+  }
+  .sig{
+    font-family:'Segoe Script','Brush Script MT','Comic Sans MS',cursive;
+    font-size:17px;
+    color:#31406b;
+    transform:rotate(-2deg);
+    display:inline-block;
+  }
+  .unsigned{
+    display:inline-block;
+    border:1.5px dashed var(--red);
+    color:var(--red);
+    padding:2px 8px;
+    font-weight:bold;
+    letter-spacing:1px;
+  }
+  .coffee{
+    position:absolute;
+    width:110px;height:104px;
+    right:12px;top:96px;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 50%, #0000 52%, #6f4a2455 56%, #6f4a2488 60%, #0000 64%),
+      radial-gradient(circle at 50% 50%, #8a5a2e22 0 48%, #0000 52%),
+      radial-gradient(circle at 78% 24%, #6f4a2466 0 7%, #0000 10%);
+    transform:rotate(14deg);
+    filter:blur(.4px);
+  }
+
+  /* verdict stamp slammed onto the paper */
+  .verdict-stamp{
+    position:absolute;
+    top:38%;left:50%;
+    transform:translate(-50%,-50%) rotate(-14deg) scale(2.4);
+    font-family:var(--stamp-font);
+    font-size:44px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    padding:2px 16px;
+    border:5px double currentColor;
+    border-radius:6px;
+    opacity:0;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+  .verdict-stamp.show{
+    animation:slam .18s ease-in forwards;
+  }
+  .verdict-stamp.approved{color:var(--green)}
+  .verdict-stamp.denied{color:var(--red)}
+  @keyframes slam{
+    to{opacity:.88;transform:translate(-50%,-50%) rotate(-14deg) scale(1)}
+  }
+
+  /* ---------- verdict ticker ---------- */
+  .ticker{
+    margin-top:12px;
+    min-height:22px;
+    font-size:12.5px;
+    letter-spacing:.4px;
+    color:#e6dfc5;
+    text-align:center;
+    max-width:min(440px,88vw);
+  }
+  .ticker.bad{color:#ff9d8c}
+  .ticker.good{color:#b9d98f}
+
+  /* ---------- stamp buttons ---------- */
+  .stamps{
+    display:flex;
+    gap:26px;
+    margin:14px 0 26px;
+  }
+  .stamp-btn{
+    font-family:var(--stamp-font);
+    font-size:clamp(20px,5vw,26px);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:#f3ecd8;
+    padding:16px 30px 14px;
+    border-radius:10px;
+    border:0;
+    cursor:pointer;
+    position:relative;
+    transition:transform .06s;
+  }
+  .stamp-btn .key{
+    display:block;
+    font-family:var(--ui-font);
+    font-size:9px;
+    letter-spacing:2px;
+    opacity:.75;
+    margin-top:3px;
+  }
+  .stamp-btn.deny{
+    background:linear-gradient(180deg,#c6503f,var(--red));
+    box-shadow:0 6px 0 #6e2015, 0 10px 14px #00000066;
+  }
+  .stamp-btn.approve{
+    background:linear-gradient(180deg,#3d8a4f,var(--green));
+    box-shadow:0 6px 0 #1b4023, 0 10px 14px #00000066;
+  }
+  .stamp-btn:active{transform:translateY(5px)}
+  .stamp-btn.deny:active{box-shadow:0 1px 0 #6e2015, 0 3px 6px #00000066}
+  .stamp-btn.approve:active{box-shadow:0 1px 0 #1b4023, 0 3px 6px #00000066}
+  .stamp-btn:focus-visible{outline:3px solid var(--sticky);outline-offset:3px}
+  .stamp-btn:disabled{opacity:.55;cursor:default}
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:#141a15e0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:10;
+  }
+  .overlay[hidden]{display:none}
+  .memo{
+    background:
+      repeating-linear-gradient(180deg,#0000 0 26px,#00000006 26px 27px),
+      linear-gradient(165deg,#f4ecd4,var(--paper));
+    color:var(--ink);
+    font-family:var(--type-font);
+    width:min(420px,94vw);
+    padding:26px 28px 24px;
+    box-shadow:0 14px 30px #000000aa;
+    transform:rotate(-.6deg);
+    border:1px solid var(--paper-edge);
+  }
+  .memo .memo-tag{
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .memo h2{
+    font-family:var(--stamp-font);
+    font-weight:normal;
+    font-size:44px;
+    letter-spacing:3px;
+    margin:6px 0 2px;
+    line-height:.95;
+    text-wrap:balance;
+  }
+  .memo h2 .sub{
+    display:block;
+    font-size:15px;
+    letter-spacing:5px;
+    color:var(--red);
+  }
+  .memo p{font-size:13px;line-height:1.55;margin:12px 0}
+  .memo ul{font-size:12.5px;line-height:1.6;margin:10px 0;padding-left:18px}
+  .memo .big-score{
+    font-size:42px;
+    font-weight:bold;
+    font-variant-numeric:tabular-nums;
+    margin:4px 0 0;
+  }
+  .memo .review-title{
+    display:inline-block;
+    font-family:var(--stamp-font);
+    font-size:20px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--red);
+    border:3px double var(--red);
+    border-radius:4px;
+    padding:3px 12px;
+    transform:rotate(-3deg);
+    margin:10px 0 4px;
+  }
+  .memo .go-btn{
+    display:block;
+    width:100%;
+    margin-top:16px;
+    font-family:var(--stamp-font);
+    font-size:22px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:#f3ecd8;
+    background:linear-gradient(180deg,#31518a,var(--ink));
+    border:0;
+    border-radius:8px;
+    padding:13px 10px 11px;
+    cursor:pointer;
+    box-shadow:0 5px 0 #141b30;
+    transition:transform .06s;
+  }
+  .memo .go-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #141b30}
+  .memo .go-btn:focus-visible{outline:3px solid var(--sticky);outline-offset:3px}
+  .memo .fineprint{font-size:9.5px;color:var(--ink-faint);margin-top:12px;letter-spacing:.5px}
+
+  /* ---------- responsive: sticky note tucks above on small screens ---------- */
+  @media (max-width: 720px){
+    .sticky{
+      position:static;
+      transform:rotate(-1.5deg);
+      width:min(340px,88vw);
+      margin-bottom:14px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .sticky ul{flex:1;columns:1}
+    .sticky h2{writing-mode:initial;font-size:13px;max-width:64px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .paper.slide-in,.paper.fly-off,.paper.rejected-shake,.verdict-stamp.show{
+      animation-duration:.01s;
+    }
+    .stamp-btn,.memo .go-btn{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nameplate">
+    <small>Federal Bureau of Forms · Sub-Basement 4</small>
+    <h1>Dept. of Redundancy Dept.</h1>
+  </div>
+  <div class="counter">
+    <span class="label">Processed</span>
+    <span class="value" id="score">0</span>
+    <div class="strikes" aria-label="warnings">
+      <span class="strike-slot" id="s0">✗</span>
+      <span class="strike-slot" id="s1">✗</span>
+      <span class="strike-slot" id="s2">✗</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="sticky" aria-label="Regulations">
+    <h2>Regulations</h2>
+    <ul>
+      <li>Only form <b>A-38</b> may be approved. All other codes: DENY.</li>
+      <li>Unsigned forms: DENY.</li>
+      <li>Coffee stains void everything: DENY.</li>
+    </ul>
+    <span class="reg">— Reg. 7c, ¶12, as amended, obviously</span>
+  </div>
+
+  <div class="patience">
+    <div class="label">Queue patience</div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <div class="paper-zone">
+    <div class="paper" id="paper" aria-live="polite">
+      <div class="form-head">
+        <div>
+          <div class="form-label">Form code</div>
+          <div class="form-code" id="fcode">A-38</div>
+        </div>
+        <div class="dept">
+          Official Request<br>In Triplicate (Copy 3 of 3)
+          <div class="barcode"></div>
+        </div>
+      </div>
+      <div class="form-label">Subject of request</div>
+      <div class="request-text" id="ftext"></div>
+      <div class="form-meta">
+        <div>
+          <div class="form-label">Ref. No.</div>
+          <span id="fref">0000/X</span>
+        </div>
+        <div style="text-align:right">
+          <div class="form-label">Signature</div>
+          <span id="fsig"></span>
+        </div>
+      </div>
+      <div class="coffee" id="fcoffee" hidden></div>
+      <div class="verdict-stamp" id="vstamp">Denied</div>
+    </div>
+  </div>
+
+  <div class="ticker" id="ticker" aria-live="polite"></div>
+
+  <div class="stamps">
+    <button class="stamp-btn deny" id="btnDeny">
+      Deny<span class="key">← left arrow</span>
+    </button>
+    <button class="stamp-btn approve" id="btnApprove">
+      Approve<span class="key">right arrow →</span>
+    </button>
+  </div>
+</main>
+
+<div class="overlay" id="startOverlay">
+  <div class="memo">
+    <span class="memo-tag">Internal memo · read fully · twice</span>
+    <h2>Stempel!<span class="sub">Bureau of Forms</span></h2>
+    <p>Congratulations on your new position, Clerk. Citizens will submit requests. You will stamp them. That is your entire life now.</p>
+    <ul>
+      <li><b>APPROVE</b> only form <b>A-38</b>, signed, stain-free.</li>
+      <li><b>DENY</b> everything else. Enjoy it.</li>
+      <li>Three mistakes and you are transferred to the Fax Department. Nobody returns from the Fax Department.</li>
+    </ul>
+    <button class="go-btn" id="btnStart">Begin shift</button>
+    <p class="fineprint">By clicking, you agree to form G-77 (Agreement to Agree), which you have not seen and never will.</p>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay" hidden>
+  <div class="memo">
+    <span class="memo-tag">Performance review · confidential-ish</span>
+    <h2>Shift over</h2>
+    <p id="endReason">You have been reassigned.</p>
+    <div class="form-label">Forms processed correctly</div>
+    <div class="big-score" id="endScore">0</div>
+    <div class="review-title" id="endTitle">Paper Intern</div>
+    <p id="endQuote"></p>
+    <button class="go-btn" id="btnRetry">Appeal (form A-38 required)</button>
+    <p class="fineprint">Your appeal has been pre-denied for your convenience.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var REQUESTS = [
+    "Application to reclassify the office plant, Gerhard, as a full-time employee with dental coverage.",
+    "Request for permission to request permission (Level 2 Permission Request Request).",
+    "Formal complaint about the complaint form. Filed on the complaint form.",
+    "Proposal to schedule a meeting to discuss reducing the number of meetings.",
+    "Petition to legally recognize Friday as a soup.",
+    "Expense claim: one (1) emotional support stapler, name of Reinhold.",
+    "Application to rename the printer 'Gerald' following its unprovoked aggression.",
+    "Request for a three-hour lunch break. Medical reason provided: 'hunger'.",
+    "Proposal to replace all fire drills with interpretive dance rehearsals.",
+    "Request for one additional form to be attached to this form (form not attached).",
+    "Application to declare the break room a sovereign nation, 'Kitchenette-Land'.",
+    "Request to be CC'd on emails about not being CC'd on emails.",
+    "Petition to lower the office thermostat by 0.5°C and raise it back immediately.",
+    "Application for a permit to daydream during the 14:00 status call.",
+    "Expense claim: 47 identical black pens. All of them are missing.",
+    "Request that the elevator music be changed to slightly different elevator music.",
+    "Proposal to award the coffee machine 'Employee of the Month' (3rd consecutive win).",
+    "Application to bring a falcon to work. The falcon has references.",
+    "Request for retroactive approval of a decision that has already gone quite badly.",
+    "Petition to make 'reply all' a criminal offence, punishable by more forms.",
+    "Application to store one (1) personal cheese in the shared refrigerator, long-term.",
+    "Request to officially classify Mondays as 'a prank that went too far'.",
+    "Proposal that all future proposals be proposed via interpretive humming.",
+    "Application for a window. Not a window seat. Just a window, to hold."
+  ];
+
+  var NAMES = [
+    "K. Müller-Lüdenscheidt","B. Papierkram","H. Formular","G. Stempelmann",
+    "F. von Ablage","L. Ordnermeier","R. Tackerberg","U. Sachbearbeiter",
+    "D. Klemmbrett","W. Zwischenablage","M. Aktenzeichen","J. Büroklammer"
+  ];
+
+  var WRONG_CODES = ["B-12","C-99","A-39","A-83","Z-01","A-3.8"];
+
+  var TITLES = [
+    [0,  "Return-to-Intern Academy", "The academy has also denied you."],
+    [5,  "Probationary Paper Pusher", "You may now touch the good paperclips. Supervised."],
+    [12, "Certified Clerk, 3rd Class", "Your stamp arm shows genuine promise."],
+    [20, "Senior Stamp Technician", "Colleagues whisper your name in the copy room."],
+    [30, "Deputy Director of Denials", "You denied a form in your sleep. It was correct."],
+    [42, "Supreme Chancellor of Bureaucracy", "The forms fear YOU now."]
+  ];
+
+  var score=0, strikes=0, locked=true, current=null;
+  var deadline=0, duration=6000, rafId=0;
+
+  var $=function(id){return document.getElementById(id)};
+  var paper=$("paper"), fill=$("fill"), ticker=$("ticker"), vstamp=$("vstamp");
+  var btnA=$("btnApprove"), btnD=$("btnDeny");
+
+  /* ---- tiny stamp thunk via WebAudio ---- */
+  var actx=null;
+  function thunk(){
+    try{
+      if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==="suspended") actx.resume();
+      var t=actx.currentTime;
+      var o=actx.createOscillator(), g=actx.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(140,t);
+      o.frequency.exponentialRampToValueAtTime(45,t+0.09);
+      g.gain.setValueAtTime(0.35,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t+0.15);
+      var buf=actx.createBuffer(1,2048,actx.sampleRate);
+      var d=buf.getChannelData(0);
+      for(var i=0;i<2048;i++) d[i]=(Math.random()*2-1)*(1-i/2048);
+      var n=actx.createBufferSource(), ng=actx.createGain();
+      n.buffer=buf; ng.gain.setValueAtTime(0.18,t);
+      n.connect(ng); ng.connect(actx.destination); n.start(t);
+    }catch(e){/* silence is also very bureaucratic */}
+  }
+
+  function rand(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+  function makeForm(){
+    var r=Math.random();
+    var f={code:"A-38", signed:true, coffee:false, flaw:null};
+    if(r<0.55){ /* valid */ }
+    else if(r<0.72){ f.code=rand(WRONG_CODES); f.flaw="code"; }
+    else if(r<0.88){ f.signed=false; f.flaw="sig"; }
+    else { f.coffee=true; f.flaw="coffee"; }
+    f.valid=!f.flaw;
+    f.text=rand(REQUESTS);
+    f.name=rand(NAMES);
+    f.ref=String(1000+Math.floor(Math.random()*9000))+"/"+
+          String.fromCharCode(65+Math.floor(Math.random()*26));
+    return f;
+  }
+
+  function renderForm(f){
+    $("fcode").textContent="FORM "+f.code;
+    $("ftext").textContent=f.text;
+    $("fref").textContent=f.ref;
+    var sig=$("fsig");
+    if(f.signed){ sig.className="sig"; sig.textContent="~ "+f.name+" ~"; }
+    else{ sig.className="unsigned"; sig.textContent="[ UNSIGNED ]"; }
+    $("fcoffee").hidden=!f.coffee;
+    vstamp.className="verdict-stamp";
+  }
+
+  function nextForm(){
+    current=makeForm();
+    renderForm(current);
+    paper.className="paper";
+    void paper.offsetWidth; /* restart animation */
+    paper.className="paper slide-in";
+    duration=Math.max(2600, 6000-score*130);
+    deadline=performance.now()+duration;
+    locked=false;
+    btnA.disabled=btnD.disabled=false;
+    cancelAnimationFrame(rafId);
+    rafId=requestAnimationFrame(tickTimer);
+  }
+
+  function tickTimer(now){
+    var left=deadline-now;
+    var pct=Math.max(0,left/duration);
+    fill.style.width=(pct*100)+"%";
+    fill.className="fill"+(pct<0.35?" angry":"");
+    if(left<=0){ timeout(); return; }
+    rafId=requestAnimationFrame(tickTimer);
+  }
+
+  function setTicker(msg,cls){
+    ticker.textContent=msg;
+    ticker.className="ticker"+(cls?" "+cls:"");
+  }
+
+  function flawExplanation(f){
+    if(f.flaw==="code")  return "That was form "+f.code+", not A-38. The code is the whole point!";
+    if(f.flaw==="sig")   return "It was UNSIGNED. A form without a signature is merely paper.";
+    if(f.flaw==="coffee")return "Coffee stain! Reg. 7c is very clear and very dry.";
+    return "That form was perfectly valid. The applicant is quietly weeping at counter 4.";
+  }
+
+  function addStrike(){
+    strikes++;
+    for(var i=0;i<3;i++) $("s"+i).className="strike-slot"+(i<strikes?" hit":"");
+    if(strikes>=3){ setTimeout(endGame,700); return true; }
+    return false;
+  }
+
+  function timeout(){
+    if(locked) return;
+    locked=true;
+    btnA.disabled=btnD.disabled=true;
+    cancelAnimationFrame(rafId);
+    setTicker("Too slow! The queue has begun a low, threatening hum.","bad");
+    paper.classList.add("rejected-shake");
+    if(addStrike()) return;
+    setTimeout(nextForm,900);
+  }
+
+  function decide(approve){
+    if(locked||!current) return;
+    locked=true;
+    btnA.disabled=btnD.disabled=true;
+    cancelAnimationFrame(rafId);
+    thunk();
+
+    vstamp.textContent=approve?"Approved":"Denied";
+    vstamp.className="verdict-stamp show "+(approve?"approved":"denied");
+
+    var correct=(approve===current.valid);
+    if(correct){
+      score++;
+      $("score").textContent=score;
+      var praise=(score>0 && score%5===0)
+        ? "Five in a row of adequacy. A plaque is being considered."
+        : (approve?"Correctly approved. The stamp glistens.":"Correctly denied. Somewhere, a supervisor smiles thinly.");
+      setTicker(praise,"good");
+      setTimeout(function(){
+        paper.classList.add("fly-off");
+        setTimeout(nextForm,380);
+      },420);
+    }else{
+      setTicker("WRONG. "+flawExplanation(current),"bad");
+      paper.classList.add("rejected-shake");
+      if(addStrike()) return;
+      setTimeout(nextForm,1300);
+    }
+  }
+
+  function endGame(){
+    cancelAnimationFrame(rafId);
+    var t=TITLES[0];
+    for(var i=0;i<TITLES.length;i++){ if(score>=TITLES[i][0]) t=TITLES[i]; }
+    $("endScore").textContent=score;
+    $("endTitle").textContent=t[1];
+    $("endQuote").textContent=t[2];
+    $("endReason").textContent=
+      "Three infractions. Security (Norbert, 64, tired) will escort you to the Fax Department.";
+    $("endOverlay").hidden=false;
+  }
+
+  function startGame(){
+    score=0; strikes=0;
+    $("score").textContent="0";
+    for(var i=0;i<3;i++) $("s"+i).className="strike-slot";
+    setTicker("Shift started. The forms are already forming.");
+    $("startOverlay").hidden=true;
+    $("endOverlay").hidden=true;
+    nextForm();
+  }
+
+  btnA.addEventListener("click",function(){decide(true)});
+  btnD.addEventListener("click",function(){decide(false)});
+  $("btnStart").addEventListener("click",startGame);
+  $("btnRetry").addEventListener("click",startGame);
+
+  document.addEventListener("keydown",function(e){
+    if(!$("startOverlay").hidden || !$("endOverlay").hidden){
+      if(e.key==="Enter"||e.key===" "){
+        var vis=$("startOverlay").hidden?$("btnRetry"):$("btnStart");
+        if(document.activeElement!==vis){ e.preventDefault(); startGame(); }
+      }
+      return;
+    }
+    if(e.key==="ArrowRight"){ e.preventDefault(); decide(true); }
+    if(e.key==="ArrowLeft"){ e.preventDefault(); decide(false); }
+  });
+
+  btnA.disabled=btnD.disabled=true;
+})();
+</script>
+</body>
+</html>
